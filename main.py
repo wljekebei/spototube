@@ -3,6 +3,7 @@ from spotipy.oauth2 import SpotifyOAuth
 from ytmusicapi import YTMusic, OAuthCredentials
 import os
 from dotenv import load_dotenv
+from colorama import Fore
 
 load_dotenv()
 
@@ -33,8 +34,8 @@ yt = YTMusic("oauth.json", oauth_credentials=OAuthCredentials(
 SPid = '2iUyerShp2PjCiuEWXzSBB'
 
 def ytcreate():
-    YTname = input("Enter name of the playlist: ")
-    YTdescription = input("Enter description of the playlist: ")
+    YTname = input(Fore.LIGHTBLUE_EX + "Enter name of the playlist: " + Fore.LIGHTMAGENTA_EX)
+    YTdescription = input(Fore.LIGHTBLUE_EX + "Enter description of the playlist: " + Fore.LIGHTMAGENTA_EX)
     YTid = yt.create_playlist(YTname, YTdescription)
     return YTid
 
@@ -48,7 +49,7 @@ def wholePlaylist(playlist_id):
         playlistTracks = sp.next(playlistTracks)
         result.extend(playlistTracks['items'])
 
-    print("Tracks from Spotify were added to list!\n")
+    print(Fore.LIGHTGREEN_EX + "\nTracks from Spotify were added to list!\n")
 
     return result
 
@@ -60,10 +61,10 @@ def addYT(tracks, playlist_id):
     for item in tracks:
         searchRes = yt.search(f"{item['track']['name']} {item['track']['artists'][0]['name']}", limit=1, filter='songs')
         if decision != 'all':
-            decision = input(f"\nDo we add {searchRes[0]['title']} by {searchRes[0]['artists'][0]['name']}? (y/n/all): ")
+            decision = input(f"\n{Fore.WHITE}Do we add {Fore.YELLOW} {searchRes[0]['title']} {Fore.WHITE}by {Fore.CYAN} {searchRes[0]['artists'][0]['name']}? {Fore.WHITE}(y/n/all): ")
         if decision == 'y' or decision == 'all':
             yt.add_playlist_items(playlist_id, [searchRes[0]['videoId']])
-            print(f"{searchRes[0]['title']} by {searchRes[0]['artists'][0]['name']} was added!")
+            print(f"{Fore.YELLOW} {searchRes[0]['title']} {Fore.WHITE}by {Fore.CYAN} {searchRes[0]['artists'][0]['name']} {Fore.GREEN} was added! {Fore.WHITE}")
 
 
 YTid = ytcreate() # playlist creation
