@@ -28,13 +28,11 @@ yt = YTMusic("oauth.json", oauth_credentials=OAuthCredentials(
     client_id=os.getenv("YT_ID"),
     client_secret=os.getenv("YT_SECRET")))
 
-""" 
-тест
+# тест
 
-search_results = yt.search("Oasi Wonderll", filter='songs')
-for res in search_results:
-    print(res['title'], '-', res['artists'][0]['name'])
-"""
+# search_results = yt.search("Oasi Wonderll", filter='songs')
+# for res in search_results:
+#     print(res['title'], '-', res['artists'][0]['name'])
 
 # get tracks from spotify
 
@@ -48,10 +46,21 @@ def wholePlaylist(playlist_id):
 
     return result
 
-"""
-вывод всего плейлиста
+    # найти песню в ютубе -> добавить песню в плейлист -> по кругу
 
-for idx, item in enumerate(wholePlaylist('2iUyerShp2PjCiuEWXzSBB')):
-    if (item['track'] != None):
-        print(idx, item['track']['name'], '-', item['track']['artists'][0]['name'])
-"""
+SPid = '2iUyerShp2PjCiuEWXzSBB'
+def addYT(tracks):
+    YTid = yt.create_playlist('imba', 'test ty kokot')
+    for item in tracks:
+        searchRes = yt.search(f"{item['track']['name']} {item['track']['artists'][0]['name']}", limit=1, filter='songs')
+        yt.add_playlist_items(YTid, [searchRes[0]['videoId']])
+        print(f"{searchRes[0]['title']} by {searchRes[0]['artists'][0]['name']} was added!")
+
+res = wholePlaylist(id)
+addYT(res)
+
+# вывод всего плейлиста
+
+# for idx, item in enumerate(wholePlaylist('2iUyerShp2PjCiuEWXzSBB')):
+#     if (item['track'] != None):
+#         print(idx, item['track']['name'], '-', item['track']['artists'][0]['name'])
