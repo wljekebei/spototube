@@ -28,39 +28,44 @@ yt = YTMusic("oauth.json", oauth_credentials=OAuthCredentials(
     client_id=os.getenv("YT_ID"),
     client_secret=os.getenv("YT_SECRET")))
 
-# тест
+# playlists id's and creation
 
-# search_results = yt.search("Oasi Wonderll", filter='songs')
-# for res in search_results:
-#     print(res['title'], '-', res['artists'][0]['name'])
+SPid = '2iUyerShp2PjCiuEWXzSBB'
 
-# get tracks from spotify
+def ytcreate():
+    YTname = input("Enter name of the playlist: ")
+    YTdescription = input("Enter description of the playlist: ")
+    YTid = yt.create_playlist(YTname, YTdescription)
+    return YTid
+
+# get spotify playlist
 
 def wholePlaylist(playlist_id):
-    playlistTracks = sp.playlist_tracks(playlist_id='2iUyerShp2PjCiuEWXzSBB', limit=100)
+    playlistTracks = sp.playlist_tracks(playlist_id=SPid, limit=100)
     result = playlistTracks['items']
 
     while playlistTracks['next']:
         playlistTracks = sp.next(playlistTracks)
         result.extend(playlistTracks['items'])
 
+    print("Tracks from Spotify were added to list!\n")
+
     return result
 
-    # найти песню в ютубе -> добавить песню в плейлист -> по кругу
 
-SPid = '2iUyerShp2PjCiuEWXzSBB'
-def addYT(tracks):
-    YTid = yt.create_playlist('imba', 'test ty kokot')
+# add tracks to yt music
+
+def addYT(tracks, playlist_id):
+    decision = '0'
     for item in tracks:
         searchRes = yt.search(f"{item['track']['name']} {item['track']['artists'][0]['name']}", limit=1, filter='songs')
-        yt.add_playlist_items(YTid, [searchRes[0]['videoId']])
-        print(f"{searchRes[0]['title']} by {searchRes[0]['artists'][0]['name']} was added!")
+        if decision != 'all':
+            decision = input(f"\nDo we add {searchRes[0]['title']} by {searchRes[0]['artists'][0]['name']}? (y/n/all): ")
+        if decision == 'y' or decision == 'all':
+            yt.add_playlist_items(playlist_id, [searchRes[0]['videoId']])
+            print(f"{searchRes[0]['title']} by {searchRes[0]['artists'][0]['name']} was added!")
 
-res = wholePlaylist(id)
-addYT(res)
 
-# вывод всего плейлиста
-
-# for idx, item in enumerate(wholePlaylist('2iUyerShp2PjCiuEWXzSBB')):
-#     if (item['track'] != None):
-#         print(idx, item['track']['name'], '-', item['track']['artists'][0]['name'])
+YTid = ytcreate() # playlist creation
+res = wholePlaylist(id) # got all Spotify songs
+addYT(res, YTid) # adding everything to YTMusic
