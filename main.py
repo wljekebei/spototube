@@ -59,14 +59,15 @@ def wholePlaylist(playlist_id):
 def addYT(tracks, playlist_id):
     decision = '0'
     for item in tracks:
-        searchRes = yt.search(f"{item['track']['name']} {item['track']['artists'][0]['name']}", limit=1, filter='songs')
-        if decision != 'all':
-            decision = input(f"\n{Fore.WHITE}Do we add {Fore.YELLOW} {searchRes[0]['title']} {Fore.WHITE}by {Fore.CYAN} {searchRes[0]['artists'][0]['name']}? {Fore.WHITE}(y/n/all): ")
-        if decision == 'y' or decision == 'all':
-            yt.add_playlist_items(playlist_id, [searchRes[0]['videoId']])
-            print(f"{Fore.YELLOW} {searchRes[0]['title']} {Fore.WHITE}by {Fore.CYAN} {searchRes[0]['artists'][0]['name']} {Fore.GREEN} was added! {Fore.WHITE}")
-
+        if item is not None and item['track'] is not None:
+            searchRes = yt.search(f"{item['track']['name']} {item['track']['artists'][0]['name']}", limit=1, filter='songs')
+            if searchRes is not None:
+                if decision != 'all':
+                    decision = input(f"\n{Fore.WHITE}Do we add {Fore.YELLOW} {searchRes[0]['title']} {Fore.WHITE}by {Fore.CYAN} {searchRes[0]['artists'][0]['name']}? {Fore.WHITE}(y/n/all): ")
+                if decision == 'y' or decision == 'all':
+                    yt.add_playlist_items(playlist_id, [searchRes[0]['videoId']])
+                    print(f"{Fore.YELLOW} {searchRes[0]['title']} {Fore.WHITE}by {Fore.CYAN} {searchRes[0]['artists'][0]['name']} {Fore.GREEN} was added! {Fore.WHITE}")
 
 YTid = ytcreate() # playlist creation
-res = wholePlaylist(id) # got all Spotify songs
+res = wholePlaylist(SPid) # got all Spotify songs
 addYT(res, YTid) # adding everything to YTMusic
