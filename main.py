@@ -68,6 +68,38 @@ def addYT(tracks, playlist_id):
                     yt.add_playlist_items(playlist_id, [searchRes[0]['videoId']])
                     print(f"{Fore.YELLOW} {searchRes[0]['title']} {Fore.WHITE}by {Fore.CYAN} {searchRes[0]['artists'][0]['name']} {Fore.GREEN} was added! {Fore.WHITE}")
 
-YTid = ytcreate() # playlist creation
-res = wholePlaylist(SPid) # got all Spotify songs
-addYT(res, YTid) # adding everything to YTMusic
+# get yt playlist
+
+YTid = 'PLme4Sfi3EAQgWfuuIR_kOcrHYLBA1-qfH'
+
+def getYtPlaylist(playlist_id):
+    YTplaylist = yt.get_playlist(playlist_id)
+    YTlist = YTplaylist['tracks']
+    print(f"{Fore.LIGHTGREEN_EX}Got playlist named {Fore.YELLOW}{YTplaylist['title']}{Fore.LIGHTGREEN_EX}!")
+    SPlist = wholePlaylist(SPid)
+    matchIndex = -1
+    matchTrack = None
+    for ytitem in YTlist:
+        for i, spitem in enumerate(SPlist):
+            if spitem is not None and spitem['track'] is not None and spitem['track']['name'] is not None:
+                if ytitem['title'] == spitem['track']['name']:
+                    matchIndex = i
+                    matchTrack = ytitem['title']
+    
+    if matchIndex != -1:
+        print(f"{Fore.WHITE}Last found same track: {Fore.YELLOW}{matchTrack}{Fore.WHITE}\n")
+        return SPlist[matchIndex + 1:]
+    else:
+        print(f"{Fore.RED}No matching tracks found!{Fore.WHITE}\n")
+        return SPlist
+
+if int(input(f"{Fore.WHITE}Add to playlist or create new? (1/2): ")) == 2:
+    YTid = ytcreate() # playlist creation
+    res = wholePlaylist(SPid) # got all Spotify songs
+else:
+    res = getYtPlaylist(YTid)
+
+if res:
+    addYT(res, YTid) # adding everything to YTMusic
+else:
+    print("No new tracks to add!")
