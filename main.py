@@ -61,7 +61,7 @@ def addYT(tracks, playlist_id):
     for item in tracks:
         if item is not None and item['track'] is not None:
             searchRes = yt.search(f"{item['track']['name']} {item['track']['artists'][0]['name']}", limit=1, filter='songs')
-            if searchRes is not None:
+            if searchRes is not None and len(searchRes) > 0:
                 if decision != 'all':
                     decision = input(f"\n{Fore.WHITE}Do we add {Fore.YELLOW} {searchRes[0]['title']} {Fore.WHITE}by {Fore.CYAN} {searchRes[0]['artists'][0]['name']}? {Fore.WHITE}(y/n/all): ")
                 if decision == 'y' or decision == 'all':
@@ -77,6 +77,11 @@ def getYtPlaylist(playlist_id):
     YTlist = YTplaylist['tracks']
     print(f"{Fore.LIGHTGREEN_EX}Got playlist named {Fore.YELLOW}{YTplaylist['title']}{Fore.LIGHTGREEN_EX}!")
     SPlist = wholePlaylist(SPid)
+
+    if (YTplaylist['trackCount'] > 200):
+        print("Your YT playlist already has >200 songs, approximated track which you should start with:")
+        return SPlist [(YTplaylist['trackCount'] + 155):]
+    
     matchIndex = -1
     matchTrack = None
     for ytitem in YTlist:
@@ -85,7 +90,8 @@ def getYtPlaylist(playlist_id):
                 if ytitem['title'] == spitem['track']['name']:
                     matchIndex = i
                     matchTrack = ytitem['title']
-    
+                    break
+
     if matchIndex != -1:
         print(f"{Fore.WHITE}Last found same track: {Fore.YELLOW}{matchTrack}{Fore.WHITE}\n")
         return SPlist[matchIndex + 1:]
@@ -93,13 +99,15 @@ def getYtPlaylist(playlist_id):
         print(f"{Fore.RED}No matching tracks found!{Fore.WHITE}\n")
         return SPlist
 
-if int(input(f"{Fore.WHITE}Add to playlist or create new? (1/2): ")) == 2:
-    YTid = ytcreate() # playlist creation
-    res = wholePlaylist(SPid) # got all Spotify songs
-else:
-    res = getYtPlaylist(YTid)
+# if int(input(f"{Fore.WHITE}Add to playlist or create new? (1/2): ")) == 2:
+#     YTid = ytcreate() # playlist creation
+#     res = wholePlaylist(SPid) # got all Spotify songs
+# else:
+#     res = getYtPlaylist(YTid)
 
-if res:
-    addYT(res, YTid) # adding everything to YTMusic
-else:
-    print("No new tracks to add!")
+# if res:
+#     addYT(res, YTid) # adding everything to YTMusic
+# else:
+#     print("No new tracks to add!")
+
+print(sp.playlist_cover_image(SPid))
