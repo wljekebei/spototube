@@ -29,10 +29,6 @@ yt = YTMusic("oauth.json", oauth_credentials=OAuthCredentials(
     client_id=os.getenv("YT_ID"),
     client_secret=os.getenv("YT_SECRET")))
 
-# playlists id's and creation
-
-SPid = '2iUyerShp2PjCiuEWXzSBB'
-
 def ytcreate():
     YTname = input(Fore.LIGHTBLUE_EX + "Enter name of the playlist: " + Fore.LIGHTMAGENTA_EX)
     YTdescription = input(Fore.LIGHTBLUE_EX + "Enter description of the playlist: " + Fore.LIGHTMAGENTA_EX)
@@ -53,11 +49,23 @@ def wholePlaylist(playlist_id):
 
     return result
 
+def wholeLiked():
+    likedTracks = sp.current_user_saved_tracks()
+    result = likedTracks['items']
+
+    while likedTracks['next']:
+        likedTracks = sp.next(likedTracks)
+        result.extend(likedTracks['items'])
+
+    print(Fore.LIGHTGREEN_EX + "\nTracks from Spotify were added to list!\n")
+
+    return result
 
 # add tracks to yt music
 
 def addYT(tracks, playlist_id):
     decision = '0'
+    i = 0
     for item in tracks:
         if item is not None and item['track'] is not None:
             searchRes = yt.search(f"{item['track']['name']} {item['track']['artists'][0]['name']}", limit=1, filter='songs')
@@ -65,12 +73,10 @@ def addYT(tracks, playlist_id):
                 if decision != 'all':
                     decision = input(f"\n{Fore.WHITE}Do we add {Fore.YELLOW} {searchRes[0]['title']} {Fore.WHITE}by {Fore.CYAN} {searchRes[0]['artists'][0]['name']}? {Fore.WHITE}(y/n/all): ")
                 if decision == 'y' or decision == 'all':
+                    i += 1
                     yt.add_playlist_items(playlist_id, [searchRes[0]['videoId']])
                     print(f"{Fore.YELLOW} {searchRes[0]['title']} {Fore.WHITE}by {Fore.CYAN} {searchRes[0]['artists'][0]['name']} {Fore.GREEN} was added! {Fore.WHITE}")
-
-# get yt playlist
-
-YTid = 'PLme4Sfi3EAQgWfuuIR_kOcrHYLBA1-qfH'
+    print(f"{Fore.LIGHTGREEN_EX}{i} tracks were added!{Fore.WHITE}\n")
 
 def getYtPlaylist(playlist_id):
     YTplaylist = yt.get_playlist(playlist_id)
@@ -98,16 +104,23 @@ def getYtPlaylist(playlist_id):
     else:
         print(f"{Fore.RED}No matching tracks found!{Fore.WHITE}\n")
         return SPlist
+    
 
-# if int(input(f"{Fore.WHITE}Add to playlist or create new? (1/2): ")) == 2:
-#     YTid = ytcreate() # playlist creation
-#     res = wholePlaylist(SPid) # got all Spotify songs
-# else:
-#     res = getYtPlaylist(YTid)
+if input(f"{Fore.WHITE}Adding from Spotify playlist or liked songs? (1/2): ") == '1':
+    SPid = input(f"{Fore.WHITE}Enter Spotify playlist ID: ")
+    # 2iUyerShp2PjCiuEWXzSBB
+    res = wholePlaylist(SPid) # got all Spotify songs
+else:
+    res = wholeLiked()
 
-# if res:
-#     addYT(res, YTid) # adding everything to YTMusic
-# else:
-#     print("No new tracks to add!")
+if int(input(f"{Fore.WHITE}Add to playlist or create new? (1/2): ")) == 2:
+    YTid = ytcreate() # playlist creation 
+else:
+    YTid = input(f"{Fore.WHITE}Enter YT Music playlist id: ")
+    res = getYtPlaylist(YTid)
+    # PLme4Sfi3EAQgWfuuIR_kOcrHYLBA1-qfH
 
-print(sp.playlist_cover_image(SPid))
+if res:
+    addYT(res, YTid) # adding everything to YTMusic
+else:
+    print("No new tracks to add!")
