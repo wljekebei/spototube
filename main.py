@@ -21,7 +21,8 @@ scope = (
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope, 
     client_id=os.getenv("SP_ID"), 
     client_secret=os.getenv("SP_SECRET"), 
-    redirect_uri=os.getenv("SP_URI")))
+    redirect_uri=os.getenv("SP_URI"),
+    cache_path= '.cache-lera'))
 
 # yt music setup
 
@@ -75,7 +76,7 @@ def addYT(tracks, playlist_id):
                 if decision == 'y' or decision == 'all':
                     i += 1
                     yt.add_playlist_items(playlist_id, [searchRes[0]['videoId']])
-                    print(f"{Fore.YELLOW} {searchRes[0]['title']} {Fore.WHITE}by {Fore.CYAN} {searchRes[0]['artists'][0]['name']} {Fore.GREEN} was added! {Fore.WHITE}")
+                    print(f"{Fore.WHITE}{i}/{len(tracks)}: {Fore.YELLOW} {searchRes[0]['title']} {Fore.WHITE}by {Fore.CYAN} {searchRes[0]['artists'][0]['name']} {Fore.GREEN} was added! {Fore.WHITE}")
     print(f"{Fore.LIGHTGREEN_EX}{i} tracks were added!{Fore.WHITE}\n")
 
 def getYtPlaylist(playlist_id):
@@ -112,6 +113,9 @@ if input(f"{Fore.WHITE}Adding from Spotify playlist or liked songs? (1/2): ") ==
     res = wholePlaylist(SPid) # got all Spotify songs
 else:
     res = wholeLiked()
+
+if input(f"{Fore.WHITE}In reverse order? (y/n): ") == 'y':
+    res = res[::-1]
 
 if int(input(f"{Fore.WHITE}Add to playlist or create new? (1/2): ")) == 2:
     YTid = ytcreate() # playlist creation 
